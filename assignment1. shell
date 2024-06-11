@@ -1,1 +1,8 @@
-
+#!bin/bash
+FILE ="myfile.txt"
+if[-f "$FILE"];
+Then
+echo "file exists"
+else
+echo "file not found"
+fi
