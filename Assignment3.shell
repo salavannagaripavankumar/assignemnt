@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Define the function
+count_lines() {
+  local file=$1
+  if [ -f "$file" ]; then
+    lines=$(wc -l < "$file")
+    echo "The file $file has $lines lines."
+  else
+    echo "File $file not found."
+  fi
+}
+
+# Call the function with different filenames
+count_lines "file1.txt"
+count_lines "file2.txt"
+count_lines "non_existent_file.txt"
+count_lines "example.sh"
