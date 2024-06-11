@@ -1,0 +1,5 @@
+#!/bin/bash
+#sample log file
+LOGFILE = "sample.log"
+#extract lines containing "error"using grep
+grep "ERROR" "$LOGFILE|AWK'{PRINT$1""$2""$nf}'
