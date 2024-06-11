@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Set debugging mode (optional)
+DEBUG=false
+if [ "$1" = "-d" ]; then
+  DEBUG=true
+  shift
+fi
+
+# Create the directory
+DIRNAME="TestDir"
+if [ -d "$DIRNAME" ]; then
+  if $DEBUG; then
+    echo "Debug: Directory $DIRNAME already exists."
+  fi
+  echo "Error: Directory $DIRNAME already exists. Aborting."
+  exit 1
+fi
+
+if ! mkdir "$DIRNAME"; then
+  if $DEBUG; then
+    echo "Debug: Failed to create directory $DIRNAME."
+  fi
+  echo "Error: Failed to create directory $DIRNAME. Check permissions."
+  exit 1
+fi
+
+# Create the files
+for i in {1..10}; do
+  filename="File$i.txt"
+  filepath="$DIRNAME/$filename"
+  if ! echo "$filename" > "$filepath"; then
+    if $DEBUG; then
+      echo "Debug: Failed to create file $filepath."
+    fi
+    echo "Error: Failed to create file $filepath. Check permissions."
+    exit 1
+  fi
+  if $DEBUG; then
+    echo "Debug: Created file $filepath with content '$filename'."
+  fi
+done
+
+echo "Success: Created directory $DIRNAME with 10 files."
