@@ -1,0 +1,63 @@
+ASSIGNMENT 1:
+
+SDLC Overview - Create a one-page infographic that outlines the SDLC phases (Requirements, 
+Design, Implementation, Testing, Deployment), highlighting the importance of each phase and how they interconnect
+1. Requirements:
+
+•	Objective: Gather and analyze the project requirements from stakeholders.
+•	Importance: Establishes a clear understanding of what needs to be built.
+•	Key Activities:
+o	Conduct stakeholder interviews.
+o	Document functional and non-functional requirements.
+o	Create use cases and user stories.
+•	Output: Requirement Specification Document.
+
+2. Design:
+
+•	Objective: Plan the solution architecture and design the system.
+•	Importance: Provides a blueprint for development and ensures all requirements are covered.
+•	Key Activities:
+o	System architecture design.
+o	Database design.
+o	User interface design.
+o	Create design documents (e.g., UML diagrams).
+•	Output: Design Specification Document.
+
+3. Implementation:
+
+•	Objective: Develop and code the system based on design specifications.
+•	Importance: Translates design into a functional software product.
+•	Key Activities:
+o	Write code following best practices.
+o	Integrate different modules.
+o	Conduct unit testing.
+•	Output: Source Code.
+
+4. Testing:
+
+•	Objective: Ensure the software is bug-free and meets the requirements.
+•	Importance: Identifies defects and ensures the quality of the product.
+•	Key Activities:
+o	Perform various testing (unit, integration, system, user acceptance).
+o	Log and fix bugs.
+o	Validate functionality against requirements.
+•	Output: Tested Software Product.
+
+5. Deployment:
+
+•	Objective: Release the software to the production environment.
+•	Importance: Makes the software available for use by end-users.
+•	Key Activities:
+o	Prepare deployment environment.
+o	Deploy code to production.
+o	Conduct post-deployment testing.
+o	Monitor system for any issues.
+•	Output: Deployed Software Product.
+
+Interconnection of Phases:
+
+•	Requirements ↔ Design: Design is based on the requirements; changes in requirements may necessitate design changes.
+•	Design ↔ Implementation: Implementation is guided by the design; design flaws can impact coding.
+•	Implementation ↔ Testing: Testing is performed on the implemented code; detected issues require revisiting the implementation phase.
+•	Testing ↔ Deployment: Only thoroughly tested software is deployed; post-deployment issues might require revisiting testing.
+•	Deployment ↔ Requirements: User feedback post-deployment can lead to new requirements, starting a new SDLC cycle.
