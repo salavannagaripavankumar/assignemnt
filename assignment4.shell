@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Create the directory
+mkdir TestDir
+
+# Create the files
+for i in {1..10}; do
+  filename="File$i.txt"
+  echo "$filename" > "TestDir/$filename"
+done
