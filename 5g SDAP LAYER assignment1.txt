@@ -1,0 +1,264 @@
+1. Overall Structure of the SDAP Layer 
+
+The Service Data Adaptation Protocol (SDAP) layer in 5G NR is a key component in the user plane protocol stack. 
+It resides between the Packet Data Convergence Protocol (PDCP) layer and the Application layer, 
+providing the necessary functions to manage Quality of Service (QoS) for data flows. 
+The main components and functions of the SDAP layer are: 
+
+SDAP Entities: 
+Each PDU session has an associated SDAP entity. 
+
+QoS Flow Management: 
+Handles mapping of QoS flows to Data Radio Bearers (DRBs). 
+
+SDAP Headers: 
+Adds and removes headers for data packets to ensure proper routing and QoS treatment. 
+
+Reflective QoS: 
+Allows the user equipment (UE) to map downlink QoS flow to uplink flow based on network-provided rules. 
+
+The SDAP layer's primary role is to ensure that data packets are delivered according to their QoS requirements,
+ enhancing the end-user experience by providing reliable and consistent data transmission. 
+
+
+2. Role of SDAP Entities 
+
+SDAP entities are crucial for managing QoS flows within the SDAP layer. 
+Each SDAP entity corresponds to a PDU session and is responsible for the following tasks: 
+
+QoS Flow Identification:
+ Identifying the QoS Flow Identifier (QFI) for each data packet. 
+
+QoS Flow to DRB Mapping:
+ Mapping each QoS flow to the appropriate DRB based on QoS requirements. 
+
+Data Packet Handling: 
+Ensuring data packets are encapsulated with the necessary SDAP headers and routed correctly. 
+
+Reflective QoS Management: 
+Enabling reflective QoS mapping by setting the Reflective QoS Indicator (RQI) in the SDAP header. 
+
+By managing these tasks, SDAP entities ensure that data packets are handled according to 
+their QoS requirements, maintaining the quality and reliability of the data transmission. 
+
+3. Mapping QoS Flows to DRBs :
+
+The process of mapping QoS flows to DRBs in the SDAP layer involves several steps: 
+
+QoS Flow Identification: 
+Each data packet is associated with a QoS Flow Identifier (QFI) that indicates its QoS requirements. 
+
+QoS Parameters Assessment: 
+The SDAP layer assesses the QoS parameters associated with the QFI, such as latency, throughput, and priority. 
+
+DRB Selection: 
+Based on the QoS parameters, the SDAP layer selects the appropriate DRB that can meet the required QoS. 
+
+Header Addition: 
+An SDAP header is added to the data packet, containing the QFI and other relevant QoS information. 
+
+Data Transmission: 
+The data packet is transmitted over the selected DRB, ensuring it receives the necessary QoS treatment. 
+
+This mapping process ensures that data packets are transmitted over the most suitable DRBs, 
+optimizing network resources and maintaining the desired QoS levels for different types of traffic. 
+
+Example: 
+
+ 
+
+#include <iostream> 
+
+#include <vector> 
+
+#include <string> 
+
+  
+
+// QoS Flow class to represent QoS Flows 
+
+class QoSFlow { 
+
+public: 
+
+    std::string name;  // Name or identifier of the QoS flow 
+
+    QoSFlow(std::string name) : name(name) {} 
+
+}; 
+
+  
+
+// SDAP Entity class to represent SDAP entities 
+
+class SDAPEntity { 
+
+public: 
+
+    std::vector<QoSFlow> qosFlows;  // List of QoS flows managed by the SDAP entity 
+
+  
+
+    // Method to add a QoS flow to the SDAP entity 
+
+    void addQoSFlow(const QoSFlow& flow) { 
+
+        qosFlows.push_back(flow); 
+
+    } 
+
+  
+
+    // Method to display all QoS flows managed by the SDAP entity 
+
+    void displayQoSFlows() const { 
+
+        std::cout << "QoS Flows managed by this SDAP Entity:" << std::endl; 
+
+        for (const auto& flow : qosFlows) { 
+
+            std::cout << "  - " << flow.name << std::endl; 
+
+        } 
+
+    } 
+
+}; 
+
+  
+
+// PDCP Entity class to represent PDCP entities 
+
+class PDCPEntity { 
+
+public: 
+
+    std::string data;  // Data handled by the PDCP entity 
+
+  
+
+    // Constructor to initialize PDCP entity with data 
+
+    PDCPEntity(std::string data) : data(data) {} 
+
+  
+
+    // Method to display the data handled by the PDCP entity 
+
+    void displayData() const { 
+
+        std::cout << "PDCP Data: " << data << std::endl; 
+
+    } 
+
+}; 
+
+  
+
+// Main function to simulate the SDAP architecture 
+
+int main() { 
+
+    // Creating QoS Flows 
+
+    QoSFlow flow1("VoiceCall"); 
+
+    QoSFlow flow2("VideoStreaming"); 
+
+  
+
+    // Creating SDAP Entities 
+
+    SDAPEntity sdapUE; 
+
+    SDAPEntity sdapGNB; 
+
+  
+
+    // Adding QoS Flows to SDAP Entities 
+
+    sdapUE.addQoSFlow(flow1);  // Adding VoiceCall QoS Flow to UE SDAP Entity 
+
+    sdapGNB.addQoSFlow(flow2); // Adding VideoStreaming QoS Flow to gNB SDAP Entity 
+
+  
+
+    // Creating PDCP Entities 
+
+    PDCPEntity pdcpUE("VoiceCall Data Stream"); 
+
+    PDCPEntity pdcpGNB("VideoStreaming Data Stream"); 
+
+  
+
+    // Displaying the structure 
+
+    std::cout << "SDAP Entity at UE:" << std::endl; 
+
+    sdapUE.displayQoSFlows(); 
+
+    std::cout << "SDAP Entity at gNB:" << std::endl; 
+
+    sdapGNB.displayQoSFlows(); 
+
+  
+
+    std::cout << "PDCP Entity at UE:" << std::endl; 
+
+    pdcpUE.displayData(); 
+
+    std::cout << "PDCP Entity at gNB:" << std::endl; 
+
+    pdcpGNB.displayData(); 
+
+  
+
+    return 0; 
+
+} 
+
+
+Qos flow class
+
+Public Attribute:
+std::string name: Stores the name or identifier of the QoS flow.
+Constructor:
+QoSFlow(std::string name): Initializes the QoS flow with the provided name.
+
+
+
+sdap entity class
+
+Public Attribute:
+std::vector<QoSFlow> qosFlows: Stores a list of QoS flows managed by the SDAP entity.
+Methods:
+void addQoSFlow(const QoSFlow& flow): Adds a QoS flow to the list.
+void displayQoSFlows() const: Displays all QoS flows managed by the SDAP entity.
+
+
+pcdp entity class
+
+Public Attribute:
+std::string data: Stores the data handled by the PDCP entity.
+Constructor:
+PDCPEntity(std::string data): Initializes the PDCP entity with the provided data.
+Method:
+void displayData() const: Displays the data handled by the PDCP entity.
+
+
+main function:
+
+Creating QoS Flows:
+QoSFlow flow1("VoiceCall"): Creates a QoS flow named "VoiceCall".
+QoSFlow flow2("VideoStreaming"): Creates a QoS flow named "VideoStreaming".
+Creating SDAP Entities:
+SDAPEntity sdapUE: Creates an SDAP entity for the UE (User Equipment).
+SDAPEntity sdapGNB: Creates an SDAP entity for the gNB (gNodeB).
+Adding QoS Flows to SDAP Entities:
+sdapUE.addQoSFlow(flow1): Adds the "VoiceCall" QoS flow to the UE SDAP entity.
+sdapGNB.addQoSFlow(flow2): Adds the "VideoStreaming" QoS flow to the gNB SDAP entity.
+Creating PDCP Entities:
+PDCPEntity pdcpUE("VoiceCall Data Stream"): Creates a PDCP entity handling "VoiceCall Data Stream" for the UE.
+PDCPEntity pdcpGNB("VideoStreaming Data Stream"): Creates a PDCP entity handling "VideoStreaming Data Stream" for the gNB.
+Displaying the structure:
+Displays the QoS flows managed by each SDAP entity and the data handled by each PDCP entity.

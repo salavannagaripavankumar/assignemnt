@@ -1,0 +1,167 @@
+Establishing an SDAP Entity
+To establish an SDAP entity, the following steps are involved:
+
+SDAP Entity Creation: 
+The SDAP entity is created by the network, which involves assigning a unique SDAP entity
+ ID and configuring the entity's properties, such as the SDAP protocol version and the maximum transmit unit (MTU) size.
+
+RRC Connection Establishment: 
+The user equipment (UE) establishes an RRC connection with the network, which involves exchanging RRC connection setup and completion messages.
+
+SDAP Entity Setup: 
+The network sends an SDAP entity setup message to the UE, which includes the SDAP entity ID and other configuration parameters.
+
+SDAP Entity Activation: 
+The UE activates the SDAP entity by sending an SDAP entity activation message to the network.
+
+Releasing an SDAP Entity
+
+To release an SDAP entity, the following steps are involved:
+
+
+SDAP Entity Deactivation: 
+The UE deactivates the SDAP entity by sending an SDAP entity deactivation message to the network.
+
+RRC Connection Release: 
+The UE releases the RRC connection with the network, which involves exchanging RRC connection release and completion messages.
+
+SDAP Entity Release: 
+The network releases the SDAP entity, which involves removing the SDAP entity configuration and freeing up resources.
+
+Uplink Data Transfer
+
+The following steps are involved in uplink data transfer:
+
+
+SDAP Header Creation: 
+The UE creates an SDAP header, which includes the SDAP entity ID, sequence number, and other control information.
+
+Data Segmentation: 
+The UE segments the data into smaller packets, if necessary, to ensure that the packet size does not exceed the MTU size.
+
+SDAP Header Attachment: 
+The UE attaches the SDAP header to each packet.
+
+RRC Uplink Transmission: 
+The UE transmits the packets to the network using the RRC uplink transmission procedure.
+
+Downlink Data Transfer
+
+The following steps are involved in downlink data transfer:
+
+
+SDAP Header Creation: 
+The network creates an SDAP header, which includes the SDAP entity ID, sequence number, and other control information.
+
+Data Segmentation: 
+The network segments the data into smaller packets, if necessary, to ensure that the packet size does not exceed the MTU size.
+
+SDAP Header Attachment: 
+The network attaches the SDAP header to each packet.
+
+RRC Downlink Transmission: 
+The network transmits the packets to the UE using the RRC downlink transmission procedure.
+
+
+Reflective QoS Flow to DRB Mapping
+
+Reflective QoS flow to DRB mapping is a concept in SDAP that allows the network to
+ map QoS flows to data radio bearers (DRBs) based on the QoS requirements of the flow.
+
+ The following steps are involved:
+
+
+QoS Flow Creation: 
+The network creates a QoS flow, which includes defining the QoS requirements, such as the guaranteed bit rate (GBR) and packet delay budget (PDB).
+
+DRB Creation: 
+The network creates a DRB, which includes configuring the DRB properties, such as the DRB ID and the maximum transmit unit (MTU) size.
+
+QoS Flow to DRB Mapping:
+ The network maps the QoS flow to the DRB based on the QoS requirements of the flow.
+
+SDAP Entity Configuration:
+ The network configures the SDAP entity to use the mapped DRB for transmitting packets belonging to the QoS flow.
+ 
+ 
+ 
+ example:
+ 
+ 
+ #include <iostream>
+#include <map>
+#include <string>
+
+class SDAP_Entity {
+public:
+    SDAP_Entity();
+    ~SDAP_Entity();
+
+    void establish_SDAP_Entity(int qos_flow_id, int drb_id);
+    void release_SDAP_Entity(int qos_flow_id);
+    void downlink_data_transfer(int qos_flow_id, std::string data);
+    void uplink_data_transfer(int qos_flow_id, std::string data);
+    void reflective_qos_flow_to_drb_mapping(int qos_flow_id, int drb_id);
+
+private:
+    std::map<int, int> qos_flow_to_drb_map;
+};
+
+SDAP_Entity::SDAP_Entity() {}
+
+SDAP_Entity::~SDAP_Entity() {}
+
+void SDAP_Entity::establish_SDAP_Entity(int qos_flow_id, int drb_id) {
+    qos_flow_to_drb_map[qos_flow_id] = drb_id;
+    std::cout << "SDAP Entity established for QoS Flow " << qos_flow_id << " and DRB " << drb_id << std::endl;
+}
+
+void SDAP_Entity::release_SDAP_Entity(int qos_flow_id) {
+    qos_flow_to_drb_map.erase(qos_flow_id);
+    std::cout << "SDAP Entity released for QoS Flow " << qos_flow_id << std::endl;
+}
+
+void SDAP_Entity::downlink_data_transfer(int qos_flow_id, std::string data) {
+    if (qos_flow_to_drb_map.find(qos_flow_id) != qos_flow_to_drb_map.end()) {
+        int drb_id = qos_flow_to_drb_map[qos_flow_id];
+        std::cout << "Downlink data transfer for QoS Flow " << qos_flow_id << " and DRB " << drb_id << ": " << data << std::endl;
+    } else {
+        std::cout << "QoS Flow " << qos_flow_id << " not found" << std::endl;
+    }
+}
+
+void SDAP_Entity::uplink_data_transfer(int qos_flow_id, std::string data) {
+    if (qos_flow_to_drb_map.find(qos_flow_id) != qos_flow_to_drb_map.end()) {
+        int drb_id = qos_flow_to_drb_map[qos_flow_id];
+        std::cout << "Uplink data transfer for QoS Flow " << qos_flow_id << " and DRB " << drb_id << ": " << data << std::endl;
+    } else {
+        std::cout << "QoS Flow " << qos_flow_id << " not found" << std::endl;
+    }
+}
+
+void SDAP_Entity::reflective_qos_flow_to_drb_mapping(int qos_flow_id, int drb_id) {
+    qos_flow_to_drb_map[qos_flow_id] = drb_id;
+    std::cout << "Reflective QoS Flow to DRB mapping for QoS Flow " << qos_flow_id << " and DRB " << drb_id << std::endl;
+}
+
+int main() {
+    SDAP_Entity sdap_entity;
+
+    // Test Case 1: Establishing an SDAP Entity
+    sdap_entity.establish_SDAP_Entity(1, 10);
+
+    // Test Case 2: Releasing an SDAP Entity
+    sdap_entity.release_SDAP_Entity(1);
+
+    // Test Case 3: Data Transfer in Downlink
+    sdap_entity.establish_SDAP_Entity(2, 20);
+    sdap_entity.downlink_data_transfer(2, "Hello, World!");
+
+    // Test Case 4: Data Transfer in Uplink
+    sdap_entity.uplink_data_transfer(2, "Hello, World!");
+
+    // Test Case 5: Reflective QoS Flow to DRB Mapping
+    sdap_entity.reflective_qos_flow_to_drb_mapping(3, 30);
+
+    return 0;
+}

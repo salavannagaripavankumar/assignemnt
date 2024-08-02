@@ -1,0 +1,121 @@
+
+SDAP Protocol Data Units (PDUs)
+
+SDAP (Service Data Adaptation Protocol) is a protocol used in 5G networks to adapt the service data to the radio access network. 
+SDAP PDUs are the basic units of data exchanged between the SDAP entities.
+
+Tasks:
+
+1. Explain the difference between Data PDUs and Control PDUs
+
+Data PDUs:
+
+Used to transmit user data between the SDAP entity and the NAS (Non-Access Stratum).
+Contain a payload of user data.
+May have an SDAP header, depending on the specific use case.
+
+Control PDUs:
+
+Used to manage the SDAP entity and its connections.
+Contain control information, such as establishment and release of SDAP entities.
+Do not carry user data.
+
+2. Describe the format of a Data PDU with and without an SDAP header
+
+Data PDU with SDAP Header:
+
+SDAP Header	Payload
+D/C	R
+(1 bit)	(1 bit)
+D/C: Data/Control bit (1 = Data, 0 = Control)
+R: Reserved bit (set to 0)
+Payload: User data
+
+Data PDU without SDAP Header:
+
+Payload
+( variable )
+Payload: User data
+
+3. Illustrate the use of End-Marker Control PDU in SDAP
+
+End-Marker Control PDU:
+
+SDAP Header	End-Marker
+D/C	R
+(1 bit)	(1 bit)
+D/C: Data/Control bit (0 = Control)
+R: Reserved bit (set to 0)
+End-Marker: 
+1 byte set to 0xFF, indicating the end of a data transfer
+
+The End-Marker Control PDU is used to indicate the end of a data transfer. 
+It is sent by the SDAP entity to signal the end of the data transfer to the receiving entity.
+
+Here's an example of how the End-Marker Control PDU is used:
+
+The SDAP entity sends a series of Data PDUs to the receiving entity.
+The SDAP entity sends an End-Marker Control PDU to indicate the end of the data transfer.
+The receiving entity receives the End-Marker Control PDU and knows that the data transfer is complete.
+
+example:
+
+#include <iostream>
+
+// SDAP Entity Establishment
+void establishSdapEntity() {
+    std::cout << "SDAP Entity Establishment Request sent" << std::endl;
+    std::cout << "SDAP Entity Establishment Response received" << std::endl;
+}
+
+// SDAP Entity Release
+void releaseSdapEntity() {
+    std::cout << "SDAP Entity Release Request sent" << std::endl;
+    std::cout << "SDAP Entity Release Response received" << std::endl;
+}
+
+// SDAP Data Transfer in Downlink
+void dataTransferDownlink() {
+    std::cout << "SDAP Data PDU with payload sent in downlink" << std::endl;
+    std::cout << "SDAP Data PDU with payload received in downlink" << std::endl;
+}
+
+// SDAP Data Transfer in Uplink
+void dataTransferUplink() {
+    std::cout << "SDAP Data PDU with payload sent in uplink" << std::endl;
+    std::cout << "SDAP Data PDU with payload received in uplink" << std::endl;
+}
+
+// Mapping QoS Flow to DRB
+void mapQosFlowToDrb() {
+    std::cout << "QoS flow mapped to DRB" << std::endl;
+}
+
+// End-Marker Control PDU
+void sendEndMarker() {
+    std::cout << "End-Marker Control PDU sent" << std::endl;
+}
+
+int main() {
+    std::cout << "SDAP Protocol Data Units (PDUs) Test Cases" << std::endl;
+
+    std::cout << "\n Establishing an SDAP Entity" << std::endl;
+    establishSdapEntity();
+
+    std::cout << "\n Releasing an SDAP Entity" << std::endl;
+    releaseSdapEntity();
+
+    std::cout << "\nData Transfer in Downlink" << std::endl;
+    dataTransferDownlink();
+
+    std::cout << "\nData Transfer in Uplink" << std::endl;
+    dataTransferUplink();
+
+    std::cout << "\nMapping QoS Flow to DRB" << std::endl;
+    mapQosFlowToDrb();
+
+    std::cout << "\nSending End-Marker Control PDU" << std::endl;
+    sendEndMarker();
+
+    return 0;
+}

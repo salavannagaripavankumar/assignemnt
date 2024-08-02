@@ -1,0 +1,148 @@
+1. Key SDAP Parameters
+QoS Flow Identifier (QFI):
+Purpose: The QFI is used to identify a QoS flow within a PDU session. 
+Each data packet is tagged with a QFI that determines the QoS treatment it should receive.
+Usage: 
+QFI is essential for mapping data packets to the appropriate QoS flows, ensuring they 
+meet the required QoS parameters such as latency, throughput, and priority.
+Data/Control (D/C):
+Purpose: 
+The D/C field indicates whether a PDU is a data PDU or a control PDU. 
+This helps distinguish between user data and control information.
+Usage: 
+The D/C field is used to ensure that data packets and control messages are processed correctly according to their respective needs.
+Reflective QoS Indicator (RQI):
+Purpose: 
+The RQI is used to indicate whether reflective QoS mapping is applied. 
+Reflective QoS allows the UE to use the QoS parameters received in the downlink to apply them to the uplink.
+Usage: 
+When the RQI is set, the UE uses the QoS parameters from the downlink packet 
+to determine the QoS treatment for the corresponding uplink packet, ensuring consistent QoS in both directions.
+Reflective QoS Descriptor Index (RDI):
+Purpose: 
+The RDI is used in conjunction with RQI to identify the specific reflective QoS descriptor to be applied.
+Usage: 
+The RDI helps the UE to correctly map the QoS parameters from downlink to uplink flows when reflective QoS is used.
+
+2. Usage of Parameters in QoS Flow to DRB Mapping
+
+The process of mapping QoS flows to DRBs involves the following steps:
+
+Identification of QoS Flow: 
+Each data packet is tagged with a QFI, identifying the QoS flow it belongs to.
+QoS Parameters Assessment: 
+The SDAP layer assesses the QoS parameters associated with the QFI, such as latency, priority, and guaranteed bit rate.
+DRB Selection: 
+Based on the assessed QoS parameters, the SDAP layer selects the appropriate DRB that can meet the required QoS. 
+The selection process takes into account the QoS requirements and available DRBs.
+Packet Processing: 
+The D/C field ensures that data packets and control PDUs are processed appropriately. 
+For data packets, the SDAP header includes the QFI and other relevant information.
+Reflective QoS Application: 
+If the RQI is set, the UE applies reflective QoS mapping by using the QoS parameters from the 
+downlink packet to determine the treatment for the uplink packet, guided by the RDI.
+
+3. Importance of QoS Flow Management in 5G NR:
+Ensures Consistent User Experience
+QoS flow management is crucial for maintaining a consistent user experience. 
+By ensuring that data packets are transmitted with the appropriate QoS, users can enjoy uninterrupted and high-quality services, such as video streaming and online gaming.
+
+Efficient Resource Utilization:
+Efficient resource utilization is achieved through QoS flow management. 
+By mapping QoS flows to the most suitable DRBs, the network can optimize the use of available radio resources, maximizing throughput and minimizing latency.
+
+Supports Diverse Applications
+Supports diverse applications: 
+5G NR is designed to support a wide range of applications, from enhanced mobile broadband to ultra-reliable low-latency communications. 
+QoS flow management allows the network to meet the varying QoS requirements of these applications, ensuring that each one receives the necessary resources.
+
+Reflective QoS Enhances Flexibility:
+Reflective QoS enhances the flexibility of QoS management by allowing the UE to apply downlink QoS parameters to uplink flows. 
+This helps maintain consistent QoS in both directions, particularly in scenarios where uplink and downlink traffic patterns are similar.
+
+Overall Network Performance:
+Overall network performance is improved through effective QoS flow management. 
+By ensuring that QoS requirements are met for each data packet, the network can provide reliable and efficient service, reducing packet loss and improving latency and throughput.
+
+
+
+
+
+#include <iostream>
+#include <map>
+#include <vector>
+
+// Define SDAP parameters
+enum class QFI { QFI_1, QFI_2, QFI_3, QFI_4, QFI_5, QFI_6, QFI_7, QFI_8, QFI_9 };
+enum class DC { DC_1, DC_2, DC_3, DC_4, DC_5, DC_6, DC_7, DC_8, DC_9 };
+enum class RQI { RQI_1, RQI_2, RQI_3, RQI_4, RQI_5, RQI_6, RQI_7, RQI_8, RQI_9 };
+enum class RDI { RDI_1, RDI_2, RDI_3, RDI_4, RDI_5, RDI_6, RDI_7, RDI_8, RDI_9 };
+
+// Define QoS flow structure
+struct QoSFlow {
+    QFI qfi;
+    DC dc;
+    RQI rqi;
+    RDI rdi;
+};
+
+// Define DRB structure
+struct DRB {
+    int drbId;
+    QoSFlow qosFlow;
+};
+
+// SDAP entity class
+class SDAP {
+public:
+    // Establish SDAP entity
+    void establishSDAP() {
+        std::cout << "SDAP entity established." << std::endl;
+    }
+
+    // Release SDAP entity
+    void releaseSDAP() {
+        std::cout << "SDAP entity released." << std::endl;
+    }
+
+    // Map QoS flow to DRB
+    void mapQoSFlowToDRB(QoSFlow qosFlow, DRB& drb) {
+        drb.qosFlow = qosFlow;
+        std::cout << "QoS flow mapped to DRB." << std::endl;
+    }
+
+    // Data transfer in downlink
+    void dataTransferDownlink(DRB drb) {
+        std::cout << "Data transferred in downlink." << std::endl;
+    }
+
+    // Data transfer in uplink
+    void dataTransferUplink(DRB drb) {
+        std::cout << "Data transferred in uplink." << std::endl;
+    }
+};
+
+int main() {
+    // Create SDAP entity
+    SDAP sdap;
+
+    // Test Case 1: Establishing an SDAP Entity
+    sdap.establishSDAP();
+
+    // Test Case 2: Releasing an SDAP Entity
+    sdap.releaseSDAP();
+
+    // Test Case 3: Data Transfer in Downlink
+    QoSFlow qosFlowDownlink = {QFI::QFI_1, DC::DC_1, RQI::RQI_1, RDI::RDI_1};
+    DRB drbDownlink = {1, qosFlowDownlink};
+    sdap.mapQoSFlowToDRB(qosFlowDownlink, drbDownlink);
+    sdap.dataTransferDownlink(drbDownlink);
+
+    // Test Case 4: Data Transfer in Uplink
+    QoSFlow qosFlowUplink = {QFI::QFI_2, DC::DC_2, RQI::RQI_2, RDI::RDI_2};
+    DRB drbUplink = {2, qosFlowUplink};
+    sdap.mapQoSFlowToDRB(qosFlowUplink, drbUplink);
+    sdap.dataTransferUplink(drbUplink);
+
+    return 0;
+}

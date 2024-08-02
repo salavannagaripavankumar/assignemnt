@@ -1,0 +1,172 @@
+
+
+
+
+
+
+
+
+
+
+Services provided by SDAP to upper layers:
+
+The SDAP layer provides the following services to upper layers:
+
+QoS Flow Management: SDAP manages the Quality of Service (QoS) flows, including flow establishment, modification, and release.
+Data Transfer: SDAP provides data transfer services, including data transmission and reception, to upper layers.
+Mapping QoS Flow to DRB: SDAP maps QoS flows to Data Radio Bearers (DRBs), which are used to transport data between the UE and the network.
+Services expected from lower layers:
+
+The SDAP layer expects the following services from lower layers:
+
+Data Transport: SDAP expects the lower layers (e.g., PDCP, RLC, MAC) to provide reliable data transport services.
+QoS Support: SDAP expects the lower layers to provide QoS support, including prioritization and scheduling of data packets.
+Main functions of the SDAP layer:
+
+The main functions of the SDAP layer include:
+
+QoS Flow Management: managing QoS flows, including flow establishment, modification, and release.
+Data Transfer: providing data transfer services, including data transmission and reception.
+Mapping QoS Flow to DRB: mapping QoS flows to DRBs.
+SDAP Entity Management: managing SDAP entities, including establishment and release.
+Now, let's outline the main points for each test case:
+
+Test Case 1: Establishing an SDAP Entity
+** Preconditions**: The UE is connected to the network, and the SDAP layer is configured.
+Steps:
+The UE sends an SDAP entity establishment request to the network.
+The network responds with an SDAP entity establishment response.
+The SDAP entity is established, and the UE and network can exchange data.
+Expected Result: The SDAP entity is successfully established.
+Test Case 2: Releasing an SDAP Entity
+** Preconditions**: An SDAP entity is established between the UE and the network.
+Steps:
+The UE sends an SDAP entity release request to the network.
+The network responds with an SDAP entity release response.
+The SDAP entity is released, and the UE and network can no longer exchange data.
+Expected Result: The SDAP entity is successfully released.
+Test Case 3: Data Transfer in Downlink
+** Preconditions**: An SDAP entity is established between the UE and the network.
+Steps:
+The network sends data to the UE via the SDAP layer.
+The SDAP layer maps the QoS flow to a DRB.
+The data is transmitted to the UE via the DRB.
+Expected Result: The data is successfully transmitted to the UE.
+Test Case 4: Data Transfer in Uplink
+** Preconditions**: An SDAP entity is established between the UE and the network.
+Steps:
+The UE sends data to the network via the SDAP layer.
+The SDAP layer maps the QoS flow to a DRB.
+The data is transmitted to the network via the DRB.
+Expected Result: The data is successfully transmitted to the network.
+Mapping QoS Flow to DRB
+** Preconditions**: An SDAP entity is established between the UE and the network.
+Steps:
+The SDAP layer receives a QoS flow establishment request from the upper layers.
+The SDAP layer maps the QoS flow to a DRB based on the QoS requirements.
+The DRB is established, and the QoS flow is transmitted via the DRB.
+Expected Result: The QoS flow is successfully mapped to a DRB
+
+
+
+
+
+
+#include <iostream>
+#include <map>
+#include <vector>
+
+// Define the QoS Flow structure
+struct QoSFlow {
+    int id;
+    int priority;
+    int bandwidth;
+};
+
+// Define the DRB structure
+struct DRB {
+    int id;
+    int bandwidth;
+};
+
+// Define the SDAP Entity structure
+struct SDAPEntity {
+    int id;
+    std::map<int, QoSFlow> qosFlows;
+    std::map<int, DRB> drbs;
+};
+
+// SDAP Layer class
+class SDAP {
+public:
+    // Establish an SDAP entity
+    void establishSDAPEntity(int entityId) {
+        SDAPEntity entity;
+        entity.id = entityId;
+        sdapEntities[entityId] = entity;
+    }
+
+    // Release an SDAP entity
+    void releaseSDAPEntity(int entityId) {
+        sdapEntities.erase(entityId);
+    }
+
+    // Map QoS flow to DRB
+    void mapQoSFlowToDRB(int entityId, int qosFlowId, int drbId) {
+        SDAPEntity& entity = sdapEntities[entityId];
+        QoSFlow& qosFlow = entity.qosFlows[qosFlowId];
+        DRB& drb = entity.drbs[drbId];
+
+        // Map QoS flow to DRB
+        qosFlow.bandwidth = drb.bandwidth;
+    }
+
+    // Data transfer in downlink
+    void dataTransferDownlink(int entityId, int qosFlowId, int data) {
+        SDAPEntity& entity = sdapEntities[entityId];
+        QoSFlow& qosFlow = entity.qosFlows[qosFlowId];
+
+        // Send data via DRB
+        std::cout << "Sending data via DRB: " << data << std::endl;
+    }
+
+    // Data transfer in uplink
+    void dataTransferUplink(int entityId, int qosFlowId, int data) {
+        SDAPEntity& entity = sdapEntities[entityId];
+        QoSFlow& qosFlow = entity.qosFlows[qosFlowId];
+
+        // Send data via DRB
+        std::cout << "Sending data via DRB: " << data << std::endl;
+    }
+
+private:
+    std::map<int, SDAPEntity> sdapEntities;
+};
+
+int main() {
+    SDAP sdap;
+
+    // Test Case 1: Establishing an SDAP Entity
+    sdap.establishSDAPEntity(1);
+    std::cout << "SDAP entity established with ID: 1" << std::endl;
+
+    // Test Case 2: Releasing an SDAP Entity
+    sdap.releaseSDAPEntity(1);
+    std::cout << "SDAP entity released with ID: 1" << std::endl;
+
+    // Test Case 3: Data Transfer in Downlink
+    sdap.establishSDAPEntity(2);
+    sdap.mapQoSFlowToDRB(2, 1, 1);
+    sdap.dataTransferDownlink(2, 1, 100);
+    std::cout << "Data transferred in downlink" << std::endl;
+
+    // Test Case 4: Data Transfer in Uplink
+    sdap.dataTransferUplink(2, 1, 200);
+    std::cout << "Data transferred in uplink" << std::endl;
+
+    // Mapping QoS Flow to DRB
+    sdap.mapQoSFlowToDRB(2, 2, 2);
+    std::cout << "QoS flow mapped to DRB" << std::endl;
+
+    return 0;
+}
