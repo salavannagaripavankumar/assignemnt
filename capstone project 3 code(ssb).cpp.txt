@@ -1,0 +1,99 @@
+#include <ns3/core-module.h>
+#include <ns3/network-module.h>
+#include <ns3/mobility-module.h>
+#include <ns3/point-to-point-module.h>
+#include <ns3/internet-module.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
+using namespace ns3;
+
+// Constants
+const int NUM_SSBS_FR1 = 4;  // Number of SSBs in a burst for FR1
+const int NUM_SSBS_FR2 = 8;  // Number of SSBs in a burst for FR2
+
+// Structure to represent an SSB
+struct SSB {
+    int index;
+    double frequency;  // in MHz
+    double time;       // in ms
+    Vector location; // SSB Location
+};
+
+// Function to calculate subcarrier spacing
+double getSubcarrierSpacing(int numerology) {
+    return 15.0 * (1 << numerology); // 15 kHz * 2^µ
+}
+
+// Function to generate SSB mapping
+std::vector<SSB> generateSSBMapping(double bandwidth, int numerology, bool isFR2) {
+    int numSSBs = isFR2 ? NUM_SSBS_FR2 : NUM_SSBS_FR1;
+    std::vector<SSB> ssbs;
+
+    double scs = getSubcarrierSpacing(numerology); // Subcarrier spacing in kHz
+    double rbSize = 12 * scs / 1000; // Resource block size in MHz
+
+    double timeInterval = (isFR2 ? 5.0 : 10.0); // SSB periodicity: 5 ms for FR2, 10 ms for FR1
+    double frequencyInterval = bandwidth / numSSBs;
+
+    for (int i = 0; i < numSSBs; ++i) {
+        SSB ssb;
+        ssb.index = i;
+        ssb.frequency = i * frequencyInterval + rbSize / 2; // Center frequency of SSB
+        ssb.time = i * timeInterval / numSSBs;
+        
+        // Set SSB location based on index (for illustration)
+        ssb.location = Vector(i * 10.0, i * 5.0, 0.0); // Example: simple linear arrangement
+
+        ssbs.push_back(ssb);
+    }
+
+    return ssbs;
+}
+
+// Function to print SSB mapping
+void printSSBMapping(const std::vector<SSB>& ssbs) {
+    std::cout << "SSB Mapping:" << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    for (const auto& ssb : ssbs) {
+        std::cout << "SSB Index: " << ssb.index
+                  << ", Frequency: " << ssb.frequency << " MHz"
+                  << ", Time: " << ssb.time << " ms"
+                  << ", Location: (" << ssb.location.x << ", "
+                  << ssb.location.y << ", " << ssb.location.z << ")"
+                  << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+int main(int argc, char *argv[]) {
+    // Initialize the simulator
+    CommandLine cmd;
+    cmd.Parse(argc, argv);
+
+    // Add this line only if you want to actually run a simulation
+    Simulator::Run();
+    Simulator::Destroy();
+
+    double bandwidthFR1 = 20.0;  // Bandwidth in MHz for FR1
+    double bandwidthFR2 = 100.0; // Bandwidth in MHz for FR2
+
+    // Test with different numerologies
+    for (int numerology = 0; numerology <= 1; ++numerology) {
+        std::cout << "Testing Numerology " << numerology << ":" << std::endl;
+
+        // Generate and print SSB mapping for FR1
+        std::vector<SSB> ssbsFR1 = generateSSBMapping(bandwidthFR1, numerology, false);
+        std::cout << "FR1 SSB Mapping:" << std::endl;
+        printSSBMapping(ssbsFR1);
+
+        // Generate and print SSB mapping for FR2
+        std::vector<SSB> ssbsFR2 = generateSSBMapping(bandwidthFR2, numerology, true);
+        std::cout << "FR2 SSB Mapping:" << std::endl;
+        printSSBMapping(ssbsFR2);
+    }
+
+    return 0;
+}

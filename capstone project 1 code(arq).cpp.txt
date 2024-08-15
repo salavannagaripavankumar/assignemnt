@@ -1,0 +1,105 @@
+Project 1: ARQ Testing in RLC (Radio Link Control) 
+Code:
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/applications-module.h"
+// Class representing an RLC Protocol Data Unit
+class RLC_PDU {
+public:
+    int sequenceNumber;    // Sequence number of the PDU
+    std::string data;      // Data contained in the PDU
+
+    // Constructor to initialize a PDU with a sequence number and data
+    RLC_PDU(int sn, const std::string& d) : sequenceNumber(sn), data(d) {}
+
+    // Default constructor for RLC_PDU
+    RLC_PDU() : sequenceNumber(-1), data("") {}
+};
+
+// Class representing the RLC Acknowledged Mode (AM) with ARQ process
+class RLC_AM {
+private:
+    std::queue<RLC_PDU> transmissionBuffer;           // Queue to hold PDUs to be transmitted
+    std::unordered_map<int, RLC_PDU> sentPDUs;        // Map to store sent PDUs by sequence number
+    std::unordered_map<int, bool> receivedACKs;       // Map to store acknowledgment status of PDUs
+    std::unordered_map<int, int> retransmissionCount; // Map to track retransmission count of each PDU
+    int nextSequenceNumber = 0;                       // Next sequence number to be assigned
+    int maxRetransmissions = 5;                       // Maximum number of retransmissions allowed
+
+public:
+    // Function to segment and queue data into PDUs
+    void segmentAndQueueData(const std::string& data) {
+        int segmentSize = 5; // Simplified segment size
+        for (size_t i = 0; i < data.size(); i += segmentSize) {
+            std::string segment = data.substr(i, segmentSize);
+            RLC_PDU pdu(nextSequenceNumber++, segment);
+            transmissionBuffer.push(pdu);
+        }
+    }
+
+    // Function to transmit PDUs from the transmission buffer
+    void transmitPDUs() {
+        while (!transmissionBuffer.empty()) {
+            RLC_PDU pdu = transmissionBuffer.front();
+            transmissionBuffer.pop();
+            sendPDU(pdu);
+        }
+    }
+
+    // Function to simulate receiving an acknowledgment for a PDU
+    void receiveACK(int sequenceNumber) {
+        receivedACKs[sequenceNumber] = true;
+        std::cout << "ACK received for PDU: SN=" << sequenceNumber << std::endl;
+    }
+
+    // Function to simulate receiving a negative acknowledgment for a PDU
+    void receiveNACK(int sequenceNumber) {
+        std::cout << "NACK received for PDU: SN=" << sequenceNumber << std::endl;
+        if (sentPDUs.find(sequenceNumber) != sentPDUs.end()) {
+            RLC_PDU pdu = sentPDUs[sequenceNumber];
+            if (!receivedACKs[sequenceNumber]) {
+                retransmitPDU(pdu);
+            }
+        }
+    }
+
+private:
+    // Function to send a PDU
+    void sendPDU(const RLC_PDU& pdu) {
+        std::cout << "Transmitting PDU: SN=" << pdu.sequenceNumber << ", Data=" << pdu.data << std::endl;
+        sentPDUs[pdu.sequenceNumber] = pdu;
+        receivedACKs[pdu.sequenceNumber] = false;
+        retransmissionCount[pdu.sequenceNumber] = 0;
+    }
+
+    // Function to retransmit a PDU
+    void retransmitPDU(const RLC_PDU& pdu) {
+        if (retransmissionCount[pdu.sequenceNumber] < maxRetransmissions) {
+            std::cout << "Retransmitting PDU: SN=" << pdu.sequenceNumber << ", Data=" << pdu.data << std::endl;
+            retransmissionCount[pdu.sequenceNumber]++;
+        } else {
+            std::cout << "Max retransmissions reached for PDU: SN=" << pdu.sequenceNumber << std::endl;
+        }
+    }
+};
+
+// Main function to demonstrate the ARQ process
+int main() {
+    RLC_AM rlc;
+    rlc.segmentAndQueueData("This is a test message to be sent over RLC AM with ARQ process.");
+    rlc.transmitPDUs();
+
+    // Simulate ACKs and NACKs
+    rlc.receiveACK(0);
+    rlc.receiveNACK(1);
+    rlc.receiveACK(2);
+    rlc.receiveNACK(3);
+
+    // Process retransmissions
+    rlc.receiveNACK(1); // This will cause retransmission of PDU 1
+    rlc.receiveACK(1);  // Simulate ACK for retransmitted PDU
+
+    return 0;
+}

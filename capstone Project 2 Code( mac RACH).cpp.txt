@@ -1,0 +1,227 @@
+#include <iostream>
+
+#include <string>
+
+#include <vector>
+
+#include "ns3/core-module.h"
+
+#include "ns3/network-module.h"
+
+#include "ns3/internet-module.h"
+
+#include "ns3/mobility-module.h"
+
+#include "ns3/lte-module.h"
+
+#include "ns3/config-store.h"
+
+
+
+using namespace ns3;
+
+
+
+// Structure to represent the Random Access Preamble (MSG1)
+
+struct RACHPreamble {
+
+ std::string sequence; // Predefined sequence chosen by the UE
+
+ int timingAdvance;  // Implicitly included, estimated by the network
+
+};
+
+
+
+// Structure to represent the Random Access Response (MSG2)
+
+struct RAR {
+
+ int timingAdvanceCommand; // Provides the UE with the necessary timing advance adjustment
+
+ int temporaryCRNTI;    // Temporary identifier assigned to the UE
+
+ int uplinkGrant;     // Uplink resource allocation for the UE to send MSG3
+
+ int rarIdentifier;    // Identifies the preamble used by the UE
+
+};
+
+
+
+// Structure to represent the RRC Connection Request/Resume/Re-establishment (MSG3)
+
+struct RRCMessage {
+
+ int ueIdentity;       // Either a temporary identity (C-RNTI) or a permanent identity (like a GUTI)
+
+ std::string rrcLayerMessage; // Contains the Radio Resource Control (RRC) signaling message
+
+ std::string nasPDU;     // Non-Access Stratum Protocol Data Unit (optional)
+
+ std::string ueCapabilities; // Information regarding the UE's capabilities (optional)
+
+};
+
+
+
+// Structure to represent the RRC Connection Setup/Resume/Re-establishment (MSG4)
+
+struct RRCConfiguration {
+
+ std::string rrcConfiguration; // Details the radio resources and configuration parameters
+
+ int cRNTIAssignment;     // The network may confirm or reassign the C-RNTI for the UE
+
+ std::string securityParameters; // Provides the necessary information for the UE to establish secure communications
+
+};
+
+
+
+// Function to simulate the transmission of MSG1 (RACH Preamble)
+
+void sendMSG1(const RACHPreamble& preamble) {
+
+ std::cout << "UE sends MSG1 (RACH Preamble): " << preamble.sequence << std::endl;
+
+}
+
+
+
+// Function to simulate the transmission of MSG2 (RAR)
+
+void sendMSG2(const RAR& rar) {
+
+ std::cout << "Network sends MSG2 (RAR): ";
+
+ std::cout << "Timing Advance Command: " << rar.timingAdvanceCommand << ", ";
+
+ std::cout << "Temporary C-RNTI: " << rar.temporaryCRNTI << ", ";
+
+ std::cout << "Uplink Grant: " << rar.uplinkGrant << ", ";
+
+ std::cout << "RAR Identifier: " << rar.rarIdentifier << std::endl;
+
+}
+
+
+
+// Function to simulate the transmission of MSG3 (RRC Request)
+
+void sendMSG3(const RRCMessage& msg) {
+
+ std::cout << "UE sends MSG3 (RRC Request): ";
+
+ std::cout << "UE Identity: " << msg.ueIdentity << ", ";
+
+ std::cout << "RRC Layer Message: " << msg.rrcLayerMessage << ", ";
+
+ std::cout << "NAS PDU: " << msg.nasPDU << ", ";
+
+ std::cout << "UE Capabilities: " << msg.ueCapabilities << std::endl;
+
+}
+
+
+
+// Function to simulate the transmission of MSG4 (RRC Setup)
+
+void sendMSG4(const RRCConfiguration& config) {
+
+ std::cout << "Network sends MSG4 (RRC Setup): ";
+
+ std::cout << "RRC Configuration: " << config.rrcConfiguration << ", ";
+
+ std::cout << "C-RNTI Assignment: " << config.cRNTIAssignment << ", ";
+
+ std::cout << "Security Parameters: " << config.securityParameters << std::endl;
+
+}
+
+
+
+int main(int argc, char *argv[]) {
+
+ // Set up ns-3 simulation environment
+
+ CommandLine cmd;
+
+ cmd.Parse(argc, argv);
+
+
+
+ // Simulate the Random Access Procedure
+
+
+
+ // MSG1: UE sends a preamble to the network
+
+ RACHPreamble preamble;
+
+ preamble.sequence = "RandomAccessPreambleSequence";
+
+ preamble.timingAdvance = 10; // Estimated by the network
+
+ Simulator::Schedule(Seconds(0.0), &sendMSG1, preamble);
+
+
+
+ // MSG2: Network responds with timing advance, uplink grant, and temporary identity
+
+ RAR rar;
+
+ rar.timingAdvanceCommand = 5;
+
+ rar.temporaryCRNTI = 1234;
+
+ rar.uplinkGrant = 100;
+
+ rar.rarIdentifier = 1;
+
+ Simulator::Schedule(Seconds(1.0), &sendMSG2, rar);
+
+
+
+ // MSG3: UE sends its identity and requests connection or resume
+
+ RRCMessage msg;
+
+ msg.ueIdentity = 1234;
+
+ msg.rrcLayerMessage = "RRC Connection Request";
+
+ msg.nasPDU = "Authentication Request";
+
+ msg.ueCapabilities = "UE Capabilities";
+
+ Simulator::Schedule(Seconds(2.0), &sendMSG3, msg);
+
+
+
+ // MSG4: Network finalizes the connection setup and provides configuration
+
+ RRCConfiguration config;
+
+ config.rrcConfiguration = "RRC Configuration";
+
+ config.cRNTIAssignment = 1234;
+
+ config.securityParameters = "Security Parameters";
+
+ Simulator::Schedule(Seconds(3.0), &sendMSG4, config);
+
+
+
+ // Run the simulator
+
+ Simulator::Run();
+
+ Simulator::Destroy();
+
+
+
+ return 0;
+
+}

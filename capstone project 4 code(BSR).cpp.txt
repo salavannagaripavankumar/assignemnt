@@ -1,0 +1,212 @@
+Project 4 BSR Code:
+
+#include "ns3/core-module.h"
+
+#include "ns3/network-module.h"
+
+#include "ns3/internet-module.h"
+
+#include "ns3/lte-module.h"
+
+
+
+#include <iostream>
+
+#include <vector>
+
+#include <algorithm>
+
+#include <numeric>
+
+
+
+using namespace ns3;
+
+
+
+// Define buffer status report types
+
+enum BSRType {
+
+  SHORT_BSR,
+
+  LONG_BSR
+
+};
+
+
+
+// Class to represent a buffer status report
+
+class BufferStatusReport {
+
+public:
+
+  BSRType type;
+
+  std::vector<int> bufferSizes; // Buffer sizes for different logical channels
+
+
+
+  BufferStatusReport(BSRType t, const std::vector<int>& sizes)
+
+    : type(t), bufferSizes(sizes) {}
+
+
+
+  void print() const {
+
+    std::cout << "BSR Type: " << (type == SHORT_BSR ? "Short BSR" : "Long BSR") << "\n";
+
+    std::cout << "Buffer Sizes: ";
+
+    for (int size : bufferSizes) {
+
+      std::cout << size << " ";
+
+    }
+
+    std::cout << "\n";
+
+  }
+
+};
+
+
+
+// Class to simulate the UE (User Equipment)
+
+class UserEquipment {
+
+private:
+
+  std::vector<int> buffer; // Buffer for different logical channels
+
+
+
+public:
+
+  UserEquipment(std::size_t numChannels) : buffer(numChannels, 0) {}
+
+
+
+  void updateBuffer(std::size_t channel, int size) {
+
+    if (channel < buffer.size()) {
+
+      buffer[channel] = size;
+
+    }
+
+  }
+
+
+
+  BufferStatusReport generateBSR() const {
+
+    // Logic to decide BSR type
+
+    bool isShort = std::all_of(buffer.begin(), buffer.end(), [](int size) { return size <= 100; });
+
+    return BufferStatusReport(isShort ? SHORT_BSR : LONG_BSR, buffer);
+
+  }
+
+};
+
+
+
+// Class to simulate the network (e.g., gNodeB in 5G)
+
+class Network {
+
+public:
+
+  void processBSR(const BufferStatusReport& bsr) {
+
+    std::cout << "Processing BSR...\n";
+
+    bsr.print();
+
+    // Simulate resource allocation based on BSR
+
+    allocateResources(bsr);
+
+  }
+
+
+
+private:
+
+  void allocateResources(const BufferStatusReport& bsr) {
+
+    std::cout << "Allocating resources based on BSR...\n";
+
+    // Example allocation logic
+
+    int totalBufferSize = std::accumulate(bsr.bufferSizes.begin(), bsr.bufferSizes.end(), 0);
+
+    if (bsr.type == LONG_BSR) {
+
+      std::cout << "Long BSR detected: Allocating higher resources.\n";
+
+    } else {
+
+      std::cout << "Short BSR detected: Allocating standard resources.\n";
+
+    }
+
+    std::cout << "Total Buffer Size: " << totalBufferSize << "\n";
+
+  }
+
+};
+
+
+
+int main(int argc, char *argv[]) {
+
+  // Initialize ns-3
+
+  CommandLine cmd;
+
+  cmd.Parse(argc, argv);
+
+
+
+  // Create User Equipment with 4 logical channels
+
+  UserEquipment ue(4);
+
+
+
+  // Simulate different traffic conditions
+
+  ue.updateBuffer(0, 50); // Channel 0
+
+  ue.updateBuffer(1, 120); // Channel 1 (Triggers Long BSR)
+
+  ue.updateBuffer(2, 30); // Channel 2
+
+  ue.updateBuffer(3, 80); // Channel 3
+
+
+
+  // Generate and process BSR
+
+  BufferStatusReport bsr = ue.generateBSR();
+
+
+
+  // Create Network and process the generated BSR
+
+  Network network;
+
+  network.processBSR(bsr);
+
+
+
+  return 0;
+
+}
+

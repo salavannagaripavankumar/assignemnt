@@ -1,0 +1,515 @@
+Project 6 PUSCH
+Code:
+
+#include <iostream>
+
+#include <cmath>
+
+#include <string>
+
+#include <vector>
+
+#include <unordered_map>
+
+#include <ns3/core-module.h>
+
+#include <ns3/network-module.h>
+
+#include <ns3/lte-module.h>
+
+
+
+using namespace ns3;
+
+
+
+// Function to display transport block CRC attachment
+
+void TransportBlockCrcAttachment(int tbSize) {
+
+  int crcBits = (tbSize > 3824) ? 24 : 16;
+
+  std::cout << "1. Transport Block CRC Attachment: " << crcBits << " bits" << std::endl;
+
+}
+
+
+
+// Function to select LDPC base graph
+
+int LdpcBaseGraphSelection(int tbSize, double codingRate) {
+
+  int baseGraph;
+
+  if (codingRate < 0.25 || tbSize < 292 || (tbSize < 3824 && codingRate < 0.67)) {
+
+    baseGraph = 2;
+
+  } else {
+
+    baseGraph = 1;
+
+  }
+
+  std::cout << "2. LDPC Base Graph Selection: Base Graph " << baseGraph << std::endl;
+
+  return baseGraph;
+
+}
+
+
+
+// Updated function to perform code block segmentation and CRC attachment
+
+void CodeBlockSegmentation(int tbSize, int crcBits, int baseGraph) {
+
+  int maxSize;
+
+  int effectiveSegmentSize;
+
+
+
+  // Determine the maximum code block size and effective segment size based on the base graph
+
+  if (baseGraph == 1) {
+
+    maxSize = 8448; // Maximum code block size for Base Graph 1
+
+    effectiveSegmentSize = maxSize - 24; // Effective segment size (8448 - 24)
+
+  } else {
+
+    maxSize = 3840; // Maximum code block size for Base Graph 2
+
+    effectiveSegmentSize = maxSize - 24; // Effective segment size (3840 - 24)
+
+  }
+
+
+
+  // Check if segmentation is required
+
+  if (tbSize + crcBits > maxSize) {
+
+    // Calculate the number of segments
+
+    int numSegments = std::ceil((tbSize + crcBits) / static_cast<double>(effectiveSegmentSize));
+
+    std::cout << "3. Code Block Segmentation: Segmentation Required. Number of Segments = " << numSegments << std::endl;
+
+    std::cout << " Each segment size (excluding CRC): " << effectiveSegmentSize << " bits" << std::endl;
+
+    std::cout << " CRC bits added to each segment: 24 bits" << std::endl;
+
+  } else {
+
+    std::cout << "3. Code Block Segmentation: No Segmentation Required" << std::endl;
+
+  }
+
+}
+
+
+
+// Function to perform LDPC channel coding
+
+void LdpcChannelCoding(const std::vector<int>& data, int baseGraph) {
+
+  std::cout << "4. LDPC Channel Coding: LDPC channel codes applied" << std::endl;
+
+  // Placeholder implementation for LDPC channel coding
+
+  std::vector<int> encodedData = data; // In practice, you would apply LDPC encoding here
+
+  std::cout << " Encoded Data: ";
+
+  for (int bit : encodedData) {
+
+    std::cout << bit << " ";
+
+  }
+
+  std::cout << std::endl;
+
+}
+
+
+
+// Function to perform rate matching
+
+void RateMatching(const std::vector<int>& encodedData) {
+
+  std::cout << "5. Rate Matching: Code bits to resource mapping performed" << std::endl;
+
+  // Placeholder implementation for rate matching
+
+  std::vector<int> rateMatchedData = encodedData; // In practice, you would apply rate matching here
+
+  std::cout << " Rate Matched Data: ";
+
+  for (int bit : rateMatchedData) {
+
+    std::cout << bit << " ";
+
+  }
+
+  std::cout << std::endl;
+
+}
+
+
+
+// Function to perform code block concatenation
+
+void CodeBlockConcatenation(const std::vector<int>& rateMatchedData) {
+
+  std::cout << "6. Code Block Concatenation: Code blocks concatenated" << std::endl;
+
+  // Placeholder implementation for code block concatenation
+
+  std::vector<int> concatenatedData = rateMatchedData; // In practice, you would concatenate code blocks here
+
+  std::cout << " Concatenated Data: ";
+
+  for (int bit : concatenatedData) {
+
+    std::cout << bit << " ";
+
+  }
+
+  std::cout << std::endl;
+
+}
+
+
+
+// Function to perform data and control multiplexing
+
+void DataAndControlMultiplexing(const std::vector<int>& concatenatedData) {
+
+  std::cout << "7. Data and Control Multiplexing: HARQ acknowledgment and channel state information included" << std::endl;
+
+  // Placeholder implementation for data and control multiplexing
+
+  std::vector<int> multiplexedData = concatenatedData; // In practice, you would multiplex data and control here
+
+  std::cout << " Multiplexed Data: ";
+
+  for (int bit : multiplexedData) {
+
+    std::cout << bit << " ";
+
+  }
+
+  std::cout << std::endl;
+
+}
+
+
+
+// Function to scramble data
+
+std::vector<int> ScrambleData(const std::vector<int>& data, const std::vector<int>& pseudoRandomSequence) {
+
+  std::vector<int> scrambledData(data.size());
+
+  // Ensure the pseudo-random sequence is of the same size as the data
+
+  if (data.size() != pseudoRandomSequence.size()) {
+
+    std::cerr << "Error: Data and pseudo-random sequence sizes do not match." << std::endl;
+
+    return scrambledData;
+
+  }
+
+  // Perform modular-2 addition (XOR) between the data and the pseudo-random sequence
+
+  for (size_t i = 0; i < data.size(); ++i) {
+
+    scrambledData[i] = data[i] ^ pseudoRandomSequence[i]; // XOR operation
+
+  }
+
+  return scrambledData;
+
+}
+
+
+
+// Function to modulate data
+
+std::vector<std::string> Modulate(const std::vector<int>& scrambledData, const std::string& modulationScheme) {
+
+  std::vector<std::string> modulatedSymbols;
+
+  int bitsPerSymbol = 1; // Default for π/2-BPSK
+
+  // Determine bits per symbol based on modulation scheme
+
+  if (modulationScheme == "QPSK") {
+
+    bitsPerSymbol = 2;
+
+  } else if (modulationScheme == "16 QAM") {
+
+    bitsPerSymbol = 4;
+
+  } else if (modulationScheme == "64 QAM") {
+
+    bitsPerSymbol = 6;
+
+  } else if (modulationScheme == "256 QAM") {
+
+    bitsPerSymbol = 8;
+
+  } else if (modulationScheme == "π/2-BPSK") {
+
+    bitsPerSymbol = 1;
+
+  } else {
+
+    std::cerr << "Unknown modulation scheme: " << modulationScheme << std::endl;
+
+    return modulatedSymbols;
+
+  }
+
+  for (size_t i = 0; i < scrambledData.size(); i += bitsPerSymbol) {
+
+    std::string symbol = modulationScheme + "-" + std::to_string(scrambledData[i]); // Placeholder for actual symbol mapping
+
+    modulatedSymbols.push_back(symbol);
+
+  }
+
+  return modulatedSymbols;
+
+}
+
+
+
+// Updated LayerMapping function
+
+std::vector<std::vector<std::string>> LayerMapping(const std::vector<std::string>& modulatedSymbols, int layers) {
+
+  std::vector<std::vector<std::string>> layerMappedSymbols(layers);
+
+  // Distribute symbols to each layer in a round-robin fashion
+
+  for (size_t i = 0; i < modulatedSymbols.size(); ++i) {
+
+    size_t layerIndex = i % layers;
+
+    layerMappedSymbols[layerIndex].push_back(modulatedSymbols[i]);
+
+  }
+
+  return layerMappedSymbols;
+
+}
+
+
+
+// Function to apply transform precoding
+
+std::vector<std::vector<std::string>> TransformPrecoding(const std::vector<std::vector<std::string>>& layerMappedSymbols, const std::string& waveform) {
+
+  if (waveform == "DFT-S-OFDM") {
+
+    std::cout << "11. Transform Precoding: DFT-S-OFDM waveform applied" << std::endl;
+
+    // Placeholder implementation for transform precoding
+
+    return layerMappedSymbols; // In practice, you would apply transform precoding here
+
+  } else {
+
+    std::cout << "11. Transform Precoding: No transform precoding happened since it is " << waveform << std::endl;
+
+    return layerMappedSymbols;
+
+  }
+
+}
+
+
+
+// Function to perform precoding
+
+std::vector<std::vector<std::string>> Precoding(const std::vector<std::vector<std::string>>& precodedSymbols) {
+
+  std::cout << "12. Precoding: Precoded symbols mapped onto resource blocks" << std::endl;
+
+  // Placeholder implementation for precoding
+
+  std::vector<std::vector<std::string>> precodedResourceBlocks = precodedSymbols; // In practice, you would apply precoding here
+
+  return precodedResourceBlocks;
+
+}
+
+
+
+// Function to perform resource mapping (VRB to PRB mapping)
+
+std::vector<int> ResourceMapping(const std::vector<std::vector<std::string>>& precodedResourceBlocks, bool isDftSOfdm) {
+
+  std::cout << "14. Resource Mapping (VRB to PRB Mapping): Precoded symbols mapped onto physical resource blocks" << std::endl;
+
+  // Vector to hold the physical resource blocks (PRBs)
+
+  std::vector<int> physicalResourceBlocks;
+
+  // Number of VRBs or PRBs
+
+  size_t numVrbs = precodedResourceBlocks.size();
+
+  // Each VRB is mapped to the corresponding PRB (non-interleaved mapping)
+
+  for (size_t vrbIndex = 0; vrbIndex < numVrbs; ++vrbIndex) {
+
+    // Add the PRB index (corresponding to the VRB) to the physicalResourceBlocks vector
+
+    physicalResourceBlocks.push_back(vrbIndex);
+
+    std::cout << " VRB " << vrbIndex << " mapped to PRB " << vrbIndex << std::endl;
+
+  }
+
+  // If DFT-S-OFDM, further processing may be applied
+
+  if (isDftSOfdm) {
+
+    std::cout << "16. DFT-S-OFDM waveform applied (additional processing may be required)" << std::endl;
+
+  }
+
+  return physicalResourceBlocks;
+
+}
+
+
+
+void PuschProcess(int tbSize, double codingRate, const std::string& modulationScheme, int layers, const std::string& waveform) {
+
+  TransportBlockCrcAttachment(tbSize);
+
+  int baseGraph = LdpcBaseGraphSelection(tbSize, codingRate);
+
+  CodeBlockSegmentation(tbSize, (tbSize > 3824) ? 24 : 16, baseGraph);
+
+   
+
+  std::vector<int> exampleData = {1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0};
+
+  LdpcChannelCoding(exampleData, baseGraph);
+
+  RateMatching(exampleData);
+
+  CodeBlockConcatenation(exampleData);
+
+  DataAndControlMultiplexing(exampleData);
+
+   
+
+  std::vector<int> pseudoRandomSequence(exampleData.size(), 0);
+
+  for (size_t i = 0; i < pseudoRandomSequence.size(); ++i) {
+
+    pseudoRandomSequence[i] = rand() % 2;
+
+  }
+
+   
+
+  std::vector<int> scrambledData = ScrambleData(exampleData, pseudoRandomSequence);
+
+  std::cout << "8. Scrambling: Data scrambled with pseudo-random sequence" << std::endl;
+
+  for (int bit : scrambledData) {
+
+    std::cout << bit << " ";
+
+  }
+
+  std::cout << std::endl;
+
+   
+
+  std::vector<std::string> modulatedSymbols = Modulate(scrambledData, modulationScheme);
+
+  std::cout << "9. Modulation: Modulation Scheme Selected - " << modulationScheme << std::endl;
+
+  for (const std::string& symbol : modulatedSymbols) {
+
+    std::cout << symbol << " ";
+
+  }
+
+  std::cout << std::endl;
+
+   
+
+  std::vector<std::vector<std::string>> layerMappedSymbols = LayerMapping(modulatedSymbols, layers);
+
+  std::cout << "10. Layer Mapping: Layer mapping performed for " << layers << " layers" << std::endl;
+
+  for (size_t i = 0; i < layerMappedSymbols.size(); ++i) {
+
+    std::cout << " Layer " << i + 1 << ": ";
+
+    for (const std::string& symbol : layerMappedSymbols[i]) {
+
+      std::cout << symbol << " ";
+
+    }
+
+    std::cout << std::endl;
+
+  }
+
+   
+
+  std::vector<std::vector<std::string>> precodedSymbols = TransformPrecoding(layerMappedSymbols, waveform);
+
+  std::vector<std::vector<std::string>> precodedResourceBlocks = Precoding(precodedSymbols);
+
+  bool isDftSOfdm = (waveform == "DFT-S-OFDM");
+
+  std::vector<int> physicalResourceBlocks = ResourceMapping(precodedResourceBlocks, isDftSOfdm);
+
+   
+
+  std::cout << "15. Resource Mapping: Physical resource blocks for transmission" << std::endl;
+
+  for (int block : physicalResourceBlocks) {
+
+    std::cout << block << " ";
+
+  }
+
+  std::cout << std::endl;
+
+}
+
+
+
+int main() {
+
+  int tbSize = 1500;
+
+  double codingRate = 0.5;
+
+  std::string modulationScheme = "256 QAM";
+
+  int layers = 3;
+
+  std::string waveform = "CP-OFDM"; // Change this to "DFT-S-OFDM" to see transform precoding in action
+
+  PuschProcess(tbSize, codingRate, modulationScheme, layers, waveform);
+
+  return 0;
+
+}
+

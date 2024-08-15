@@ -1,0 +1,107 @@
+Project 6 Simulation Code Uplink
+
+#include <ns3/core-module.h>
+#include <ns3/network-module.h>
+#include <ns3/mobility-module.h>
+#include <ns3/point-to-point-module.h>
+#include <ns3/internet-module.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+#include <random>
+
+enum class CommunicationType {
+    Uplink,
+    Downlink
+};
+
+class User {
+public:
+    int id;
+    int dataDemand;
+    int allocatedResources;
+    CommunicationType type;
+
+    User(int userId, int demand, CommunicationType commType)
+        : id(userId), dataDemand(demand), allocatedResources(0), type(commType) {}
+};
+
+class ResourceAllocator {
+public:
+    int totalResources;
+    std::vector<User> users;
+
+    ResourceAllocator(int resources) : totalResources(resources) {}
+
+    void addUser(int id, int demand, CommunicationType type) {
+        users.emplace_back(id, demand, type);
+    }
+
+    void allocateResources() {
+        int totalDemand = std::accumulate(users.begin(), users.end(), 0, [](int sum, const User& user) {
+            return sum + user.dataDemand;
+        });
+
+        for (auto& user : users) {
+            if (totalDemand > 0) {
+                user.allocatedResources = (user.dataDemand * totalResources) / totalDemand;
+            }
+        }
+    }
+
+    void simulate() {
+        // Simulate resource allocation
+        allocateResources();
+
+        // Print results
+        for (const auto& user : users) {
+            std::cout << "User " << user.id << " (" << (user.type == CommunicationType::Uplink ? "Uplink" : "Downlink") << "): Demand = "
+                      << user.dataDemand << ", Allocated = " << user.allocatedResources << std::endl;
+        }
+
+        int totalThroughput = std::accumulate(users.begin(), users.end(), 0, [](int sum, const User& user) {
+            return sum + user.allocatedResources;
+        });
+
+        std::cout << "Total Throughput: " << totalThroughput << std::endl;
+        std::cout << "Average Latency: " << calculateAverageLatency() << " ms" << std::endl;
+    }
+
+    double calculateAverageLatency() {
+        int totalLatency = 0;
+        for (const auto& user : users) {
+            int latency = (user.dataDemand > 0) ? 1000 * (user.dataDemand - user.allocatedResources) / user.dataDemand : 0;
+            totalLatency += latency;
+        }
+        return static_cast<double>(totalLatency) / users.size();
+    }
+};
+
+int main() {
+    int totalResources = 100; // Total available resources
+    ResourceAllocator allocator(totalResources);
+
+    // Create a random number generator for user demands
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(5, 20);
+
+    // Simulate different scenarios
+    for (int scenario = 1; scenario <= 2; ++scenario) {
+        std::cout << "Scenario " << scenario << ":" << std::endl;
+        allocator.users.clear();
+
+        int numUsers = 5 + scenario * 5; // Increase the number of users in each scenario
+        for (int i = 0; i < numUsers; ++i) {
+            int demand = dis(gen);
+            CommunicationType type = (i % 2 == 0) ? CommunicationType::Uplink : CommunicationType::Downlink;
+            allocator.addUser(i, demand, type);
+        }
+
+        allocator.simulate();
+        std::cout << std::endl;
+    }
+
+    return 0;
+}
